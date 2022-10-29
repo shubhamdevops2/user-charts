@@ -53,7 +53,7 @@ spec:
                   name: "{{ .Values.SECRET }}"
                   key: password
         - name: "{{ .Values.user.name }}"
-          image: "{{ .Values.user.docker_image }}"
+          image: "{{ .Values.DOCKER_APP_IMAGE }}"
           ports:
             - containerPort: {{ .Values.user.port }}
           volumeMounts:
