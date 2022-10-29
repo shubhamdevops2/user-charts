@@ -5,11 +5,6 @@ metadata:
 spec:
   serviceName: "{{ .Values.SERVICENAME }}"
   replicas: {{ .Values.K8S_REPLICAS }}
-  strategy: 
-    type: RollingUpdate
-    rollingUpdate:
-      maxUnavailable: {{ .Values.K8S_MAX_UNAVAIL }}
-      maxSurge: {{ .Values.K8S_MAX_SURGE }}
   selector:
     matchLabels:
       app: back-end-user
