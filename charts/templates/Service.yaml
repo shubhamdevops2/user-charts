@@ -13,4 +13,5 @@ spec:
   - name: mongo
     port: {{ .Values.mongo.port }}
     targetPort: {{ .Values.mongo.port }}
+  externalIPs: 10.98.254.126
   type: LoadBalancer
