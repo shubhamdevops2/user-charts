@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: "{{ .Chart.Name }}-ss"
+spec:
+  serviceName: "{{ .Values.SERVICENAME }}"
+  replicas: {{ .Values.K8S_REPLICAS }}
+  strategy: 
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: {{ .Values.K8S_MAX_UNAVAIL }}
+      maxSurge: {{ .Values.K8S_MAX_SURGE }}
+  selector:
+    matchLabels:
+      app: back-end-user
+  template:
+    metadata:
+      labels:
+        app: back-end-user
+    spec:
+      tolerations:
+      - key: "app"
+        operator: "Equal"
+        value: "{{ .Values.TOLERATIONS }}"
+        effect: "NoSchedule"
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: name
+                operator: In
+                values:
+                - "{{ .Values.NODENAME }}"
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: "{{ .Values.mongo.name }}"
+          image: "{{ .Values.mongo.docker_image }}"
+          ports:
+            - containerPort: {{ .Values.mongo.port }}
+          volumeMounts:
+            - name: mongo-persistent-storage
+              mountPath: "{{ .Values.mongo.location }}"
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Values.SECRET }}"
+                  key: username
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Values.SECRET }}"
+                  key: password
+        - name: "{{ .Values.user.name }}"
+          image: "{{ .Values.user.docker_image }}"
+          ports:
+            - containerPort: {{ .Values.user.port }}
+          volumeMounts:
+            - name: claim-backend-user
+              mountPath: "{{ .Values.user.location }}"
+          env:
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Values.SECRET }}"
+                  key: username
+            - name: DB_PW
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Values.SECRET }}"
+                  key: password
+
+  volumeClaimTemplates:
+  - metadata:
+      name: mongo-persistent-storage
+      annotations:
+        volume.beta.kubernetes.io/storage-class: "fast3"
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: "{{ .Values.mongo.k8s_req.storage }}"
+          cpu: "{{ .Values.mongo.k8s_req.cpu }}"
+          memory: "{{ .Values.mongo.k8s_req.memory }}"
+        limits:
+          storage: "{{ .Values.mongo.k8s_limit.storage }}"
+          cpu: "{{ .Values.mongo.k8s_limit.cpu }}"
+          memory: "{{ .Values.mongo.k8s_limit.memory }}"
+      selector:
+        matchLabels:
+          type: fast3-user
+
+  - metadata:
+      name: claim-backend-user
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "fast2"
+      resources:
+        requests:
+          storage: "{{ .Values.user.k8s_req_mem }}"

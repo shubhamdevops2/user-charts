@@ -1,0 +1,35 @@
+NAMESPACE: 'default'
+K8S_REPLICAS: '1'
+K8S_MAX_UNAVAIL: '1'
+K8S_MAX_SURGE: '1'
+AUTOSCALE_MIN_REPLICA: '1'
+AUTOSCALE_MAX_REPLICA: '2'
+AUTOSCALE_CPU_PERCENTAGE: '50'
+SECRET: 'mysecret'
+TOLERATIONS: 'red'
+NODENAME: 'worker2' 
+SERVICENAME: 'user-service'
+
+mongo:
+  docker_image: 'mongo'
+  name: 'mongo'
+  location: '/app/*'
+  port: 27017
+  k8s_req:
+    memory: '150Mi'
+    cpu: '100m'
+    storage: '1Gi'
+  k8s_limit:
+    memory: '250Mi'
+    cpu: '200m'
+    storage: '2Gi'
+
+user:
+  docker_image: 'public.ecr.aws/y3z0f7y7/user-authentication'
+  name: 'user'
+  location: '/app/*'
+  port: 8081
+  k8s_req_mem: '500Mi'
+
+  
+  

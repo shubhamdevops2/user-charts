@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: "user-service"
+spec:
+  selector:
+    app: back-end-user
+  ports:
+  - name: user
+    port: {{ .Values.user.port }}
+    targetPort: {{ .Values.user.port }}
+    nodePort: 32572
+  - name: mongo
+    port: {{ .Values.mongo.port }}
+    targetPort: {{ .Values.mongo.port }}
+  type: LoadBalancer

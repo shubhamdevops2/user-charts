@@ -1,0 +1,13 @@
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: "{{ .Chart.Name }}-hpa"
+  namespace: "{{ .Values.NAMESPACE }}"
+spec:
+  maxReplicas: {{ .Values.AUTOSCALE_MAX_REPLICA | default "2" }}
+  minReplicas: {{ .Values.AUTOSCALE_MIN_REPLICA | default "1" }}
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: "{{ .Chart.Name }}-kd"
+  targetCPUUtilizationPercentage: {{ .Values.AUTOSCALE_CPU_PERCENTAGE | default "50" }}
