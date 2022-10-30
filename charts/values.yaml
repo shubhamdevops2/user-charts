@@ -9,7 +9,7 @@ SECRET: 'mysecret'
 TOLERATIONS: 'red'
 NODENAME: 'worker2' 
 SERVICENAME: 'user-service'
-DOCKER_APP_IMAGE: shubhamdevops2/user:1.0.2-2022-10-30-20-57-41-main
+DOCKER_APP_IMAGE: shubhamdevops2/user:1.0.0-2022-10-30-21-13-03-main
 
 mongo:
   docker_image: 'mongo'
